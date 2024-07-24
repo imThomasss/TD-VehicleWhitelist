@@ -1,4 +1,4 @@
-Thank you for purchasing this script! I appreciate the support!
+Thank you for downloading, this script was originally a paid asset, however, I decided to release this version for free.
 
 If you need any help at all, please join this discord and open a ticket!
 
