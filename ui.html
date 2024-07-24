@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Vehicle Permission</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #21212100;
+        }
+        
+        #uiContainer {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 30px;
+            border: none;
+            border-radius: 10px;
+            background-color: #333;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        #uiContainer h2 {
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        #uiContainer label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #aaa;
+        }
+        
+        #uiContainer input {
+            width: calc(100% - 20px);
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background-color: #444;
+            color: #fff;
+        }
+        
+        #uiContainer input:focus {
+            outline: none;
+            border-color: #337ab7;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        #uiContainer button {
+            width: calc(50% - 5px);
+            padding: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
+        }
+        
+        #uiContainer button#submitButton {
+            background-image: linear-gradient(to right, #34A853, #2E865F);
+            color: #fff;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        #uiContainer button#closeButton {
+            background-image: linear-gradient(to right, #FFC107, #FF9800);
+            color: #fff;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        #uiContainer button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div id="uiContainer">
+        <h2>Thomas Personal Vehicle Whitelist</h2>
+        <form id="addVehicleForm">
+            <div>
+                <label for="vehicleSpawnCode">Vehicle Hash Key </label>
+                <input type="text" id="vehicleSpawnCode" name="vehicleSpawnCode" required>
+            </div>
+            <div>
+                <label for="cfxIdentifier">Player Identifier:</label>
+                <input type="text" id="cfxIdentifier" name="cfxIdentifier" required>
+            </div>
+            <div>
+                <label for="playerName">Player Name:</label>
+                <input type="text" id="playerName" name="playerName" required>
+            </div>
+            <div>
+                <label for="playerDiscordId">Player Discord ID:</label>
+                <input type="text" id="playerDiscordId" name="playerDiscordId" required>
+            </div>
+        </form>
+        <button id="submitButton">Add Permission</button>
+        <button id="closeButton">Close</button>
+    </div>
+
+    <script>
+        function openUI() {
+    if (document.getElementById("uiContainer").style.display === "none") {
+        return;
+    }
+
+    const requestUrl = `https://${GetParentResourceName()}/open_menu`;
+
+    // Log request URL
+    console.log('Sending request to:', requestUrl);
+
+    fetch(requestUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(data => {
+        console.log('Response from server:', data); // Log response from server
+        document.getElementById("uiContainer").style.display = "block";
+        document.getElementById("uiContainer").style.removeProperty("display");
+    })
+    .catch(error => {
+        console.error('Error:', error); // Log any errors that occur
+    });
+    
+}
+
+// Function to close the UI
+function closeUI() {
+    if (document.getElementById("uiContainer").style.display === "none") {
+        // UI is already closed, do nothing
+        return;
+    }
+
+    fetch(`https://${GetParentResourceName()}/close_menu`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(data => {
+        console.log(data); // Log response from server
+        // Hide the UI container after confirmation from server
+        document.getElementById("uiContainer").style.display = "none";
+        document.body.classList.remove("nui-enabled");
+    })
+    .catch(error => {
+        console.error('Error:', error); // Log any errors that occur
+    });
+}
+        function HideUI() {
+            document.getElementById("uiContainer").style.display = "none";
+        }
+
+        // Add event listener to submit button
+        document.getElementById("submitButton").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default button behavior
+            addVehiclePermission(); // Call function to add vehicle permission
+            closeUI()
+        });
+
+        // Add event listener to close button
+        document.getElementById("closeButton").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default button behavior
+            closeUI(); // Call function to close the UI
+        });
+
+        // Function to add vehicle permission
+        function addVehiclePermission() {
+            var vehicleSpawnCode = document.getElementById("vehicleSpawnCode").value;
+            var cfxIdentifier = document.getElementById("cfxIdentifier").value;
+            var playerName = document.getElementById("playerName").value;
+            var playerDiscordId = document.getElementById("playerDiscordId").value;
+
+            // Check if any required field is empty
+            if (!vehicleSpawnCode || !cfxIdentifier || !playerName || !playerDiscordId) {
+                alert("Please fill in all the required fields.");
+                return; // Exit
+            }
+
+            // Send data to server using fetch API
+            fetch(`https://${GetParentResourceName()}/add_vehicle_permission`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    vehicleSpawnCode: vehicleSpawnCode,
+                    cfxIdentifier: cfxIdentifier,
+                    playerName: playerName,
+                    playerDiscordId: playerDiscordId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data); // Log response from server
+                closeUI(); // Close UI after permission is added
+            })
+            .catch(error => {
+                console.error('Error:', error); // Log any errors that occur
+            });
+        }
+        // Call the revealUI function to reveal the UI when the page loads
+        window.onload = function() {
+            HideUI()
+        };
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'open') {
+            // Open the UI container
+            document.getElementById("uiContainer").style.display = "block";
+            } else if (event.data.type === 'close') {
+            // Close the UI container
+            document.getElementById("uiContainer").style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>
